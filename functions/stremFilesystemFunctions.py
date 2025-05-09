@@ -1,5 +1,5 @@
 import os
-from library.filesystem import MOUNT_PATH
+from library.filesystem import MOUNT_PATH, MIN_MEDIA_SIZE_MB
 import logging
 from functions.appFunctions import getAllUserDownloads
 import shutil
@@ -71,6 +71,12 @@ def generateStremFile(file_path: str, url: str, type: str, file_name: str):
 def runStrm():
     all_downloads = getAllUserDownloads()
     for download in all_downloads:
+        file_size_bytes = download.get("file_size", 0)
+        file_size_mb = file_size_bytes / (1024 * 1024)
+        
+        if file_size_mb < MIN_MEDIA_SIZE_MB:
+            continue
+            
         file_path = generateFolderPath(download)
         if file_path is None:
             continue
