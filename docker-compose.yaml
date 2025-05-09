@@ -11,4 +11,5 @@ services:
             - TORBOX_API_KEY=<EDIT_THIS_KEY>
             - MOUNT_METHOD=strm
             - MOUNT_PATH=/torbox
+            - MIN_MEDIA_SIZE_MB=30
         image: anonymoussystems/torbox-media-center:main
