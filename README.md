@@ -92,6 +92,8 @@ To run this project you will need to add the following environment variables to 
 
 `MOUNT_REFRESH_TIME` How fast you would like your mount to look for new files. Must be either `slow` for every 3 hours, `normal` for every 2 hours, `fast` for every 1 hour, or `instant` for every 6 minutes. The default is `fast` and is optional.
 
+`MIN_MEDIA_SIZE_MB` The minimum media file size in megabytes. Files smaller than this size will be skipped and no STRM files will be generated for them. The default is `30` MB and is optional.
+
 ## 🐳 Running on Docker (recommended)
 
 1. Make sure you have Docker installed on your server/computer. You can find instructions on how to install Docker [here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04) *(you can change your distribution in the guide)*.
@@ -106,6 +108,7 @@ docker run -it -d \
     -e TORBOX_API_KEY=<EDIT_THIS_KEY> \
     -e MOUNT_METHOD=strm \
     -e MOUNT_PATH=/torbox \
+    -e MIN_MEDIA_SIZE_MB=30 \
     anonymoussystems/torbox-media-center:latest
 ```
 
@@ -125,6 +128,7 @@ services:
             - TORBOX_API_KEY=<EDIT_THIS_KEY>
             - MOUNT_METHOD=strm
             - MOUNT_PATH=/torbox
+            - MIN_MEDIA_SIZE_MB=30
         image: anonymoussystems/torbox-media-center:latest
 ```
 
