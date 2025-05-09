@@ -13,3 +13,5 @@ assert MOUNT_METHOD in [method.value for method in MountMethods], "MOUNT_METHOD 
 
 MOUNT_PATH = os.getenv("MOUNT_PATH", "./torbox")
 assert MOUNT_PATH, "MOUNT_PATH is not set in .env file"
+
+MIN_MEDIA_SIZE_MB = int(os.getenv("MIN_MEDIA_SIZE_MB", "30"))
