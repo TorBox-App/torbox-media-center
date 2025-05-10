@@ -70,6 +70,7 @@ def generateStremFile(file_path: str, url: str, type: str, file_name: str):
 
 def runStrm():
     all_downloads = getAllUserDownloads()
+    created_count = 0
     for download in all_downloads:
         file_size_bytes = download.get("file_size", 0)
         file_size_mb = file_size_bytes / (1024 * 1024)
@@ -80,9 +81,10 @@ def runStrm():
         file_path = generateFolderPath(download)
         if file_path is None:
             continue
-        generateStremFile(file_path, download.get("download_link"), download.get("metadata_mediatype"), download.get("metadata_filename"))
+        if generateStremFile(file_path, download.get("download_link"), download.get("metadata_mediatype"), download.get("metadata_filename")):
+            created_count += 1
 
-    logging.debug(f"Updated {len(all_downloads)} strm files.")
+    logging.debug(f"Updated {created_count} strm files.")
 
 def unmountStrm():
     """
