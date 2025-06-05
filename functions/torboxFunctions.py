@@ -1,3 +1,4 @@
+import re
 from library.http import api_http_client, search_api_http_client, general_http_client
 import httpx
 from enum import Enum
@@ -92,6 +93,42 @@ def getUserDownloads(type: DownloadType):
     return files, True, f"{type.value.capitalize()} fetched successfully."
 
 def searchMetadata(query: str, title_data: dict, file_name: str, full_title: str):
+    # Handle screenshot files
+    if file_name.lower().endswith(('.jpg', '.jpeg', '.png')) and "mpv-shot" in file_name:
+        return {
+            "metadata_title": "Screenshot",
+            "metadata_link": None,
+            "metadata_mediatype": "movie",
+            "metadata_image": None,
+            "metadata_backdrop": None,
+            "metadata_years": 2025,
+            "metadata_season": None,
+            "metadata_episode": None,
+            "metadata_filename": file_name,
+            "metadata_rootfoldername": "Screenshots",
+        }, True, "Screenshot file"
+    
+    # Clean up the query for movie files with various patterns
+    if re.search(r'\(\d{4}\)', file_name):
+        # Extract year in parentheses
+        year_match = re.search(r'\((\d{4})\)', file_name)
+        year = f"({year_match.group(1)})"
+        
+        if "www." in file_name or "-" in file_name:
+            # Website prefix pattern
+            match = re.search(r'(?:www\.[^-\s]*)?(?:[\s-]+)(.*?)(?:\s*\(\d{4}\))', file_name)
+            if match:
+                clean_title = match.group(1).strip()
+                query = f"{clean_title} {year}"
+                logging.debug(f"Cleaned query for website prefix: {query}")
+        else:
+            # Handle other movie title formats with year
+            title_match = re.search(r'(.*?)\s*\(\d{4}\)', file_name)
+            if title_match:
+                clean_title = title_match.group(1).strip()
+                query = f"{clean_title} {year}"
+                logging.debug(f"Cleaned query for standard format: {query}")
+    
     base_metadata = {
         "metadata_title": cleanTitle(query),
         "metadata_link": None,
@@ -106,7 +143,9 @@ def searchMetadata(query: str, title_data: dict, file_name: str, full_title: str
     }
     extension = os.path.splitext(file_name)[-1]
     try:
-        response = search_api_http_client.get(f"/meta/search/{full_title}", params={"type": "file"})
+        # Use the cleaned query instead of full_title for better search results
+        search_query = query if "www." in file_name or "-" in file_name else full_title
+        response = search_api_http_client.get(f"/meta/search/{search_query}", params={"type": "file"})
     except Exception as e:
         logging.error(f"Error searching metadata: {e}")
         return base_metadata, False, f"Error searching metadata: {e}"
