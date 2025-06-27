@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/TorBox-App/torbox-media-center/compare/v1.2.0...v1.3.0) (2025-06-27)
+
+
+### Features
+
+* uses locks to prevent database issues ([0651cb1](https://github.com/TorBox-App/torbox-media-center/commit/0651cb175e5581fb62bc347d6038e66492aaf939))
+
+
+### Bug Fixes
+
+* fixes None year issue as it is a string ([ad8caac](https://github.com/TorBox-App/torbox-media-center/commit/ad8caacc8f2009e1a25496c0580cf45860031ca9))
+
 ## [1.2.0](https://github.com/TorBox-App/torbox-media-center/compare/v1.1.0...v1.2.0) (2025-06-26)
 
 
