@@ -15,9 +15,10 @@ def generateFolderPath(data: dict):
     root_folder = data.get("metadata_rootfoldername", None)
     metadata_foldername = data.get("metadata_foldername", None)
 
+    if not root_folder or not metadata_foldername:
+        return None
+
     if data.get("metadata_mediatype") == "series":
-        if not metadata_foldername:
-            return None
         folder_path = os.path.join(
             root_folder,
             metadata_foldername,
@@ -28,8 +29,6 @@ def generateFolderPath(data: dict):
         )
 
     elif data.get("metadata_mediatype") == "anime":
-        if not metadata_foldername:
-            return None
         folder_path = os.path.join(
             root_folder,
             metadata_foldername,
