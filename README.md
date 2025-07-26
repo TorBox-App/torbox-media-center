@@ -92,6 +92,11 @@ To run this project you will need to add the following environment variables to 
 
 `MOUNT_REFRESH_TIME` How fast you would like your mount to look for new files. Must be either `slow` for every 3 hours, `normal` for every 2 hours, `fast` for every 1 hour, or `instant` for every 6 minutes. The default is `fast` and is optional.
 
+`SYMLINK_PATH` The path where symlinks to your files should be created if using `MOUNT_METHOD` of `fuse`. If inside of Docker, this path needs to be accessible to other applications. If running locally without Docker, this path must be owned. Setting is optional, omit to skip symlink creation.
+
+`SYMLINK_CREATION` When the symlinks should be created. Must be either `once`, `spawn` or `always`. `always` will create them each time the mount is refreshed, `spawn` will create them once per session or the first time the file is created in the mount path after the app starts, `once` will create them one-time only. The default is `always` and is optional.
+
+
 ## 🐳 Running on Docker with one command (recommended)
 
 We provide bash scripts for running the TorBox Media Center easily by simply copying the script to your server or computer, and running it, following the prompts. This can be helpful if you aren't familiar with Docker, permissions or servers in general. Simply choose one in [this folder](https://github.com/TorBox-App/torbox-media-center/blob/main/scripts) that pertains to your system and run it in the terminal.
