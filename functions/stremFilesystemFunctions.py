@@ -15,7 +15,7 @@ def generateFolderPath(data: dict):
     root_folder = data.get("metadata_rootfoldername", None)
     metadata_foldername = data.get("metadata_foldername", None)
 
-    if not root_folder or not metadata_foldername:
+    if not root_folder and not metadata_foldername:
         return None
 
     if data.get("metadata_mediatype") == "series":
