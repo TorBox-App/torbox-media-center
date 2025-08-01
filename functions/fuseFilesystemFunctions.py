@@ -22,6 +22,8 @@ if not hasattr(fuse, '__version__'):
 
 fuse.fuse_python_api = (0, 2)
 
+LINK_AGE = 3 * 60 * 60 # 3 hours
+
 class VirtualFileSystem:
     def __init__(self, files_list):
         self.files = files_list
@@ -175,9 +177,19 @@ class TorBoxMediaCenterFuse(Fuse):
         logging.debug(f"READ Offset: {offset}")
         file = self.vfs.get_file(path)
         
+        current_time = time.time()
         if path not in self.cached_links:
-            self.cached_links[path] = getDownloadLink(file.get('download_link'))
-        download_link = self.cached_links[path]
+            self.cached_links[path] = {
+                'link': getDownloadLink(file.get('download_link')),
+                'timestamp': current_time
+            }
+        elif current_time - self.cached_links[path]['timestamp'] > LINK_AGE:
+            download_link = getDownloadLink(file.get('download_link'))
+            self.cached_links[path] = {
+                'link': download_link,
+                'timestamp': current_time
+            }
+        download_link = self.cached_links[path]['link']
         
         start_block = offset // self.block_size
         end_block = (offset + size - 1) // self.block_size
