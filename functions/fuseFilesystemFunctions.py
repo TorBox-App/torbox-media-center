@@ -1,5 +1,5 @@
 import os
-from library.filesystem import MOUNT_PATH
+from library.filesystem import MOUNT_PATH, SYMLINK_PATH, SYMLINK_CREATION
 import stat
 import errno
 from functions.torboxFunctions import getDownloadLink, downloadFile
@@ -7,6 +7,7 @@ import time
 import sys
 import logging
 from functions.appFunctions import getAllUserDownloads
+from functions.databaseFunctions import insertData, getAllData, deleteData
 import threading
 from sys import platform
 
@@ -94,6 +95,9 @@ class VirtualFileSystem:
     def list_dir(self, path):
         return self.structure.get(path, [])
     
+
+
+    
 class FuseStat(fuse.Stat):
     def __init__(self):
         self.st_mode = 0
@@ -124,12 +128,64 @@ class TorBoxMediaCenterFuse(Fuse):
         self.max_blocks = 16
 
     def getFiles(self):
+        prev_files = []
         while True:
             files = getAllUserDownloads()
             if files:
                 self.files = files
                 self.vfs = VirtualFileSystem(self.files)
-                logging.debug(f"Updated {len(self.files)} files in VFS")
+                logging.info(f"Updated {len(self.files)} files in VFS")
+                if SYMLINK_PATH:
+                    try:
+                        get_symlink_data = getAllData('symlinks')[0]
+                    except:
+                        get_symlink_data = []
+                    # logging.debug(f"Symlink db:\n{get_symlink_data}")
+                    for file_item in files:
+                        symlink_record = file_item
+                        if file_item.get('metadata_mediatype') == 'movie':
+                            path_tail = f"movies/{file_item.get('metadata_rootfoldername')}/{file_item.get('metadata_filename')}"
+                        else:
+                            path_tail = f"series/{file_item.get('metadata_rootfoldername')}/{file_item.get('metadata_foldername')}/{file_item.get('metadata_filename')}"
+                        v_path = f"{MOUNT_PATH}/{path_tail}"
+                        s_path = f"{SYMLINK_PATH}/{path_tail}"
+                        symlink_record['real_path'] = v_path
+                        symlink_record['symlink_path'] = s_path
+                        if isinstance(get_symlink_data,list) and len(get_symlink_data) > 0:
+                            exists = any(d.get("symlink_path",None) == s_path for d in get_symlink_data)
+                        else:
+                            exists = False
+                        if exists == False or SYMLINK_CREATION == 'always':
+                            logging.debug(f"Attempting to symlink {v_path} to {s_path}")
+                            create_symlink_in_symlink_path(v_path, s_path)
+                            insertData(symlink_record,'symlinks')
+                        else:
+                            logging.debug(f"Symlink {s_path} created previously and creation set to '{SYMLINK_CREATION}'. Skipping")
+                            
+                    logging.info(f"Updated {len(files)} symlinks")
+                deleted_files = list({doc.get('item_id') for doc in prev_files} - {doc.get('item_id') for doc in files})
+                if deleted_files and SYMLINK_PATH:
+                    for file_item in deleted_files:
+                        symlink_record = file_item
+                        if file_item.get('metadata_mediatype') == 'movie':
+                            s_path = f"{SYMLINK_PATH}/movies/{file_item.get('metadata_rootfoldername')}/{file_item.get('metadata_filename')}"
+                        else:
+                            s_path = f"{SYMLINK_PATH}/series/{file_item.get('metadata_rootfoldername')}/{file_item.get('metadata_foldername')}/{file_item.get('metadata_filename')}"
+                        symlink_record['symlink_path'] = s_path
+                        deleteData(symlink_record,'symlinks')
+                        if os.path.islink(s_path):
+                            try:
+                                os.unlink(s_path)
+                                logging.debug(f"Removed symlink {s_path}")
+                            except Exception as e:
+                                logging.error(f"Cannot remove symlink {s_path}: {e}")
+                                pass
+                        else:
+                            logging.debug(f"Symlink {s_path} does not exist")
+                    logging.info(f"Removed {len(deleted_files)} broken or dead symlinks")
+
+            prev_files = files
+            logging.debug(f"Waiting 5mins before querying Torbox again for changes")
             time.sleep(300)
         
     def getattr(self, path):
@@ -268,3 +324,26 @@ def unmountFuse():
         logging.error(f"Error unmounting: {e}")
         sys.exit(1)
     logging.info("Unmounted successfully.")
+    
+    
+def create_symlink_in_symlink_path(vfs_path, symlink_path):
+    # vfs_path: the path inside the FUSE mount (e.g., /mnt/torbox_media/movies/Foo (2024)/Foo (2024).mkv)
+    # symlink_path: the desired symlink location (e.g., /home/youruser/symlinks/Foo (2024).mkv)
+    try:
+        path_split = str(symlink_path).split('/')
+        path_split = path_split[:-1]
+        path_split = [p for p in path_split if p]
+        path_joined = ''
+        for folder in path_split:
+            path_joined = f'{path_joined}/{folder}'
+            if os.path.exists(path_joined) == False:
+                logging.debug(f"Creating folder {path_joined}...")
+                os.makedirs(path_joined, exist_ok=True)
+        
+        if os.path.exists(symlink_path) or os.path.islink(symlink_path):
+            logging.debug(f"Removing existing symlink {symlink_path}")
+            os.remove(symlink_path)
+        os.symlink(vfs_path, symlink_path)
+        logging.debug(f"Symlinked {vfs_path} -> {symlink_path}")
+    except Exception as e:
+        logging.error(f"Error creating symlink: {e}")
