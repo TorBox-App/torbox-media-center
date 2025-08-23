@@ -74,11 +74,16 @@ def getUserDownloads(type: DownloadType):
         try:
             response = api_http_client.get(f"/{type.value}/mylist", params=params)
         except Exception as e:
-            logging.error(f"Error fetching {type.value}: {e}")
-            return None, False, f"Error fetching {type.value}: {e}"
+            logging.error(f"Error fetching {type.value} at offset {offset}: {e}")
+            return None, False, f"Error fetching {type.value} at offset {offset}: {e}"
         if response.status_code != 200:
-            return None, False, f"Error fetching {type.value}. {response.status_code}"
-        data = response.json().get("data", [])
+            return None, False, f"Error fetching {type.value} at offset {offset}. {response.status_code}"
+        try:
+            data = response.json().get("data", [])
+        except Exception as e:
+            logging.error(f"Error parsing {type.value} at offset {offset}: {e}")
+            logging.error(f"Response: {response.text}")
+            return None, False, f"Error parsing {type.value} at offset {offset}. {e}"
         if not data:
             break
         file_data.extend(data)
@@ -146,7 +151,7 @@ def searchMetadata(query: str, title_data: dict, file_name: str, full_title: str
         logging.error(f"Error searching metadata: {e}")
         return base_metadata, False, f"Error searching metadata: {e}"
     if response.status_code != 200:
-        logging.error(f"Error searching metadata: {response.status_code}")
+        logging.error(f"Error searching metadata: {response.status_code}. {response.text}")
         return base_metadata, False, f"Error searching metadata. {response.status_code}"
     try:
         data = response.json().get("data", [])[0]

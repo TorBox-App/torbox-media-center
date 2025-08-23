@@ -5,7 +5,7 @@ TORBOX_API_URL = "https://api.torbox.app/v1/api"
 TORBOX_SEARCH_API_URL = "https://search-api.torbox.app"
 
 transport = httpx.HTTPTransport(
-    retries=5
+    retries=10
 )
 
 api_http_client = httpx.Client(
