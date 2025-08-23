@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.3.0](https://github.com/TorBox-App/torbox-media-center/compare/v1.2.0...v1.3.0) (2025-08-23)
+
+
+### Features
+
+* adds debug values ([d794280](https://github.com/TorBox-App/torbox-media-center/commit/d794280ed4d3cd6baf45b3e3083d845d6fd52a3f))
+* uses locks to prevent database issues ([0651cb1](https://github.com/TorBox-App/torbox-media-center/commit/0651cb175e5581fb62bc347d6038e66492aaf939))
+
+
+### Bug Fixes
+
+* better logging for failures ([fa7e3b5](https://github.com/TorBox-App/torbox-media-center/commit/fa7e3b5a096fd18f6da6e3203bc57bc84290c665))
+* cached_links have a ttl of 3 hours ([61ca58f](https://github.com/TorBox-App/torbox-media-center/commit/61ca58fb862439dda07b90b27b1d2e515495d524))
+* fixes None year issue as it is a string ([ad8caac](https://github.com/TorBox-App/torbox-media-center/commit/ad8caacc8f2009e1a25496c0580cf45860031ca9))
+* handles missing files ([feac777](https://github.com/TorBox-App/torbox-media-center/commit/feac7778272e3f2a409c36949d971d1fb619bff8))
+* handles specific medias properly ([c704bcf](https://github.com/TorBox-App/torbox-media-center/commit/c704bcf6252ab20c121384a5b85679997d455482))
+
 ## [1.2.0](https://github.com/TorBox-App/torbox-media-center/compare/v1.1.0...v1.2.0) (2025-06-26)
 
 
