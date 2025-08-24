@@ -1,5 +1,5 @@
 from functions.torboxFunctions import getUserDownloads, DownloadType
-from library.filesystem import MOUNT_METHOD, MOUNT_PATH
+from library.filesystem import MOUNT_METHOD, MOUNT_PATH, SYMLINK_PATH, SYMLINK_CREATION
 from library.app import MOUNT_REFRESH_TIME
 from library.torbox import TORBOX_API_KEY
 from functions.databaseFunctions import getAllData, clearDatabase
@@ -16,6 +16,12 @@ def initializeFolders():
         os.path.join(MOUNT_PATH, "movies"),
         os.path.join(MOUNT_PATH, "series"),
     ]
+    if SYMLINK_PATH:
+        symfolders = [
+            SYMLINK_PATH,
+            os.path.join(SYMLINK_PATH, "movies"),
+            os.path.join(SYMLINK_PATH, "series"),
+        ]
 
     for folder in folders:
         if os.path.exists(folder):
@@ -26,6 +32,13 @@ def initializeFolders():
                     shutil.rmtree(item_path)
                 else:
                     os.remove(item_path)
+        else:
+            logging.debug(f"Creating folder {folder}...")
+            os.makedirs(folder, exist_ok=True)
+
+    for folder in symfolders:
+        if os.path.exists(folder):
+            logging.debug(f"Folder {folder} already exists...")
         else:
             logging.debug(f"Creating folder {folder}...")
             os.makedirs(folder, exist_ok=True)
@@ -68,8 +81,15 @@ def bootUp():
     logging.debug("Booting up...")
     logging.info("Mount method: %s", MOUNT_METHOD)
     logging.info("Mount path: %s", MOUNT_PATH)
+    logging.info("Symlink Path: %s", SYMLINK_PATH)
+    logging.info("Symlink Creation Method: %s", SYMLINK_CREATION)
     logging.info("TorBox API Key: %s", TORBOX_API_KEY)
     logging.info("Mount refresh time: %s %s", MOUNT_REFRESH_TIME, "hours")
+    if SYMLINK_CREATION != 'once':
+        try:
+            os.remove(f"{os.curdir}/symlinks.json")
+        except Exception as e:
+            logging.debug("symlinks database not yet created")
     initializeFolders()
 
     return True
@@ -79,6 +99,12 @@ def getMountMethod():
 
 def getMountPath():
     return MOUNT_PATH
+
+def getSymPath():
+    return SYMLINK_PATH
+
+def getSymCreation():
+    return SYMLINK_CREATION
 
 def getMountRefreshTime():
     return MOUNT_REFRESH_TIME
