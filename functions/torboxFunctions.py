@@ -3,6 +3,7 @@ import httpx
 from enum import Enum
 import PTN
 from library.torbox import TORBOX_API_KEY
+from library.filesystem import MOUNT_PATH, SYMLINK_PATH
 from functions.mediaFunctions import constructSeriesTitle, cleanTitle, cleanYear
 from functions.databaseFunctions import insertData
 import os
@@ -55,7 +56,7 @@ def process_file(item, file, type):
 
     metadata, _, _ = searchMetadata(title_data.get("title", file.get("short_name")), title_data, file.get("short_name"), f"{item.get('name')} {file.get('short_name')}", item.get("hash"))
     data.update(metadata)
-    logging.debug(data)
+    logging.debug(f"Processing data {data}")
     insertData(data, type.value)
     return data
 
@@ -122,6 +123,7 @@ def getUserDownloads(type: DownloadType):
         for future in as_completed(future_to_file):
             try:
                 data = future.result()
+                logging.debug(f"Future result data: {data}")
                 if data:
                     files.append(data)
             except Exception as e:
