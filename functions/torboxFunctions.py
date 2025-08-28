@@ -112,21 +112,26 @@ def searchMetadata(query: str, title_data: dict, file_name: str, full_title: str
     if re.search(r'\(\d{4}\)', file_name):
         # Extract year in parentheses
         year_match = re.search(r'\((\d{4})\)', file_name)
-        year = f"({year_match.group(1)})"
+        year = year_match.group(1)
         
         if "www." in file_name or "-" in file_name:
             # Website prefix pattern
             match = re.search(r'(?:www\.[^-\s]*)?(?:[\s-]+)(.*?)(?:\s*\(\d{4}\))', file_name)
             if match:
                 clean_title = match.group(1).strip()
-                query = f"{clean_title} {year}"
+
+                title_data["title"] = clean_title
+                title_data["year"] = year
+                query = f"{clean_title}"
                 logging.debug(f"Cleaned query for website prefix: {query}")
         else:
             # Handle other movie title formats with year
             title_match = re.search(r'(.*?)\s*\(\d{4}\)', file_name)
             if title_match:
                 clean_title = title_match.group(1).strip()
-                query = f"{clean_title} {year}"
+                query = f"{clean_title}"
+                title_data["title"] = clean_title
+                title_data["year"] = year
                 logging.debug(f"Cleaned query for standard format: {query}")
     
     base_metadata = {
