@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/TorBox-App/torbox-media-center/compare/v1.3.0...v1.4.0) (2025-08-28)
+
+
+### Features
+
+* if error searching metadata, shows query and hash for debugging ([2dcc23f](https://github.com/TorBox-App/torbox-media-center/commit/2dcc23f92f51911954c1402be56e6fa59fa96b44))
+
 ## [1.3.0](https://github.com/TorBox-App/torbox-media-center/compare/v1.2.0...v1.3.0) (2025-08-23)
 
 
