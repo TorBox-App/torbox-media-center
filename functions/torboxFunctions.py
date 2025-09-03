@@ -3,7 +3,7 @@ import httpx
 from enum import Enum
 import PTN
 from library.torbox import TORBOX_API_KEY
-from functions.mediaFunctions import constructSeriesTitle, cleanTitle, cleanYear
+from functions.mediaFunctions import constructSeriesTitle, cleanTitle, cleanYear, detectSports
 from functions.databaseFunctions import insertData
 import os
 import logging
@@ -144,7 +144,24 @@ def searchMetadata(query: str, title_data: dict, file_name: str, full_title: str
         "metadata_filename": file_name,
         "metadata_rootfoldername": title_data.get("title", None),
     }
-    extension = os.path.splitext(file_name)[-1]
+    
+    file_name_no_ext, extension = os.path.splitext(file_name)
+    sports_data = detectSports(file_name_no_ext)
+
+    if sports_data and sports_data.get("type") == "sports":
+        sport_separator = sports_data.get("sport_separator")
+        base_metadata["metadata_mediatype"] = "sports"
+        base_metadata["metadata_title"] = cleanTitle(f"{sports_data.get('team_1')} {sport_separator} {sports_data.get('team_2')}")
+        base_metadata["metadata_years"] = cleanYear(title_data.get("year", None))
+        base_metadata["metadata_filename"] = f"{sports_data.get('date')} {sports_data.get('team_1')} {sport_separator} {sports_data.get('team_2')}{extension}"
+        base_metadata["metadata_rootfoldername"] = f"{base_metadata['metadata_title']} ({base_metadata['metadata_years'] or ''})"
+        base_metadata["team_1"] = sports_data.get("team_1")
+        base_metadata["team_2"] = sports_data.get("team_2")
+        base_metadata["date"] = sports_data.get("date")
+
+        logging.debug(base_metadata)
+        return base_metadata, True, "Sports metadata detected."
+    
     try:
         response = search_api_http_client.get(f"/meta/search/{full_title}", params={"type": "file"})
     except Exception as e:

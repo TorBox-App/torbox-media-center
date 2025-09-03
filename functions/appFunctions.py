@@ -15,6 +15,7 @@ def initializeFolders():
         MOUNT_PATH,
         os.path.join(MOUNT_PATH, "movies"),
         os.path.join(MOUNT_PATH, "series"),
+        os.path.join(MOUNT_PATH, "sports"),
     ]
 
     for folder in folders:
