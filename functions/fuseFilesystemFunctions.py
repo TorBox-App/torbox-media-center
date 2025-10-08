@@ -32,9 +32,10 @@ class VirtualFileSystem:
 
     def _build_structure(self):
         structure = {
-            '/': ['movies', 'series'],
+            '/': ['movies', 'series', 'sports'],
             '/movies': set(),
-            '/series': set()
+            '/series': set(),
+            '/sports': set(),
         }
         
         
@@ -62,6 +63,13 @@ class VirtualFileSystem:
                 if season_path not in structure:
                     structure[season_path] = set()
                 structure[season_path].add(f.get('metadata_filename'))
+            
+            else:
+                path = f'/sports'
+                
+                if path not in structure:
+                    structure[path] = set()
+                structure[path].add(f.get('metadata_filename'))
         
         # consistent ordering
         for key in structure:
@@ -76,8 +84,11 @@ class VirtualFileSystem:
             if f.get('metadata_mediatype') == 'movie':
                 path = f'/movies/{f.get("metadata_rootfoldername")}/{f.get("metadata_filename")}'
                 file_map[path] = f
-            else:  # series
+            elif f.get('metadata_mediatype') == 'series':
                 path = f'/series/{f.get("metadata_rootfoldername")}/{f.get("metadata_foldername")}/{f.get("metadata_filename")}'
+                file_map[path] = f
+            else:
+                path = f'/sports/{f.get("metadata_filename")}'
                 file_map[path] = f
                 
         return file_map
