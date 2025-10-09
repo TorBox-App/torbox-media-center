@@ -1,4 +1,4 @@
-from tinydb import TinyDB
+from tinydb import TinyDB, Query
 import threading
 import logging
 
@@ -66,6 +66,25 @@ def insertData(data: dict, type: str):
             return True, "Data inserted successfully."
         except Exception as e:
             return False, f"Error inserting data. {e}"
+    
+
+def deleteData(data: dict, type: str):
+    """
+    Deletes data from the database with thread safety.
+    """
+    db = getDatabase(type)
+    db_lock = getDatabaseLock(type)
+    
+    if db is None or db_lock is None:
+        return False, "Database connection failed."
+    
+    with db_lock:
+        rem_query = Query()
+        try:
+            db.remove(rem_query.item_id == data.get('item_id',None))
+            return True, "Data removed successfully."
+        except Exception as e:
+            return False, f"Error removing data. {e}"
     
 def getAllData(type: str):
     """

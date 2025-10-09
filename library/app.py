@@ -18,3 +18,5 @@ MOUNT_REFRESH_TIME = MOUNT_REFRESH_TIME.lower()
 assert MOUNT_REFRESH_TIME in [e.name for e in MountRefreshTimes], f"Invalid mount refresh time: {MOUNT_REFRESH_TIME}. Valid options are: {[e.name for e in MountRefreshTimes]}"
 
 MOUNT_REFRESH_TIME = MountRefreshTimes[MOUNT_REFRESH_TIME].value
+
+DEBUG_MODE = os.getenv("DEBUG_MODE", False) in [True,'true']

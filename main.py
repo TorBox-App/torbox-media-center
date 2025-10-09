@@ -2,11 +2,13 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.schedulers.background import BackgroundScheduler
 from functions.appFunctions import bootUp, getMountMethod, getAllUserDownloadsFresh, getMountRefreshTime
 from functions.databaseFunctions import closeAllDatabases
+from library.app import DEBUG_MODE
 import logging
 from sys import platform
+import os
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG if DEBUG_MODE == True else logging.INFO,
     format='%(asctime)s,%(msecs)03d %(name)s %(levelname)s %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
 )
