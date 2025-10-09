@@ -53,16 +53,14 @@ def cleanYear(year: str | int):
         if not year:
             return None
         if isinstance(year, str):
+            year = re.sub(r"[–—−‐‑]", "-", year)
             year = year.split("-")[0]
+            year = year.strip()
+            return int(year)
         if type(year) is int:
             return year
         if year and year != "None":
-            if isinstance(year, str):
-                year = year.replace("-", "")
-                year = year.strip()
-                return int(year)
-            else:
-                return int(year)
+            return int(year)
         else:
             return None
     except Exception as e:
