@@ -1,4 +1,5 @@
 import re
+import logging
 
 def constructSeriesTitle(season = None, episode = None, folder: bool = False):
     """
@@ -48,11 +49,22 @@ def cleanYear(year: str | int):
     """
     Cleans the year listing which can be a string (2023-2024) or an int (2023).
     """
-    if not year:
+    try:
+        if not year:
+            return None
+        if isinstance(year, str):
+            year = year.split("-")[0]
+        if type(year) is int:
+            return year
+        if year and year != "None":
+            if isinstance(year, str):
+                year = year.replace("-", "")
+                year = year.strip()
+                return int(year)
+            else:
+                return int(year)
+        else:
+            return None
+    except Exception as e:
+        logging.error(f"Error cleaning year: {e}")
         return None
-    if isinstance(year, str):
-        year = year.split("-")[0]
-    if year and year != "None":
-        year = year.replace("-")
-        year = year.strip()
-        return int(year)
