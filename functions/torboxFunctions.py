@@ -3,6 +3,7 @@ import httpx
 from enum import Enum
 import PTN
 from library.torbox import TORBOX_API_KEY
+from library.app import SCAN_METADATA
 from functions.mediaFunctions import constructSeriesTitle, cleanTitle, cleanYear
 from functions.databaseFunctions import insertData
 import os
@@ -144,6 +145,8 @@ def searchMetadata(query: str, title_data: dict, file_name: str, full_title: str
         "metadata_filename": file_name,
         "metadata_rootfoldername": title_data.get("title", None),
     }
+    if not SCAN_METADATA:
+        return base_metadata, False, "Metadata scanning is disabled."
     extension = os.path.splitext(file_name)[-1]
     try:
         response = search_api_http_client.get(f"/meta/search/{full_title}", params={"type": "file"})
