@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.4.0](https://github.com/TorBox-App/torbox-media-center/compare/v1.3.0...v1.4.0) (2025-10-16)
+
+
+### Features
+
+* adds SCAN_METADATA and makes it false by default, better information about scanning ([847ee3b](https://github.com/TorBox-App/torbox-media-center/commit/847ee3b28fa7715988dcc9991e49c4a7f17be837))
+* if error searching metadata, shows query and hash for debugging ([2dcc23f](https://github.com/TorBox-App/torbox-media-center/commit/2dcc23f92f51911954c1402be56e6fa59fa96b44))
+
+
+### Bug Fixes
+
+* changes default of mount refresh times, adds 2 new refresh times ([67fcaa0](https://github.com/TorBox-App/torbox-media-center/commit/67fcaa0451ec1c7db3a110176883d2ae0f673466))
+* handles all hyphen-like characters ([d5d5fbe](https://github.com/TorBox-App/torbox-media-center/commit/d5d5fbe82439fe711e16b1712503233555ad8a3d))
+* handles edgecase for years with no upper year ([bef898f](https://github.com/TorBox-App/torbox-media-center/commit/bef898f9c4e29e6c33b1408eef875b6ac3a31707))
+* handles year ([8a943cf](https://github.com/TorBox-App/torbox-media-center/commit/8a943cfd89136de383c9d775beed07375935378a))
+
 ## [1.3.0](https://github.com/TorBox-App/torbox-media-center/compare/v1.2.0...v1.3.0) (2025-08-23)
 
 
