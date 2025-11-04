@@ -1,4 +1,5 @@
 import os
+from library.app import RAW_MODE
 from library.filesystem import MOUNT_PATH
 import logging
 from functions.appFunctions import getAllUserDownloads
@@ -39,33 +40,31 @@ def generateFolderPath(data: dict):
         )
     return folder_path
 
-def generateStremFile(file_path: str, url: str, type: str, file_name: str):
-    if file_path is None:
-        return
-    if type == "movie":
-        type = "movies"
-    elif type == "series":
-        type = "series"
-    elif type == "anime":
-        type = "series"
-
-    full_path = os.path.join(MOUNT_PATH, type, file_path)
-
+def generateStremFile(file_path: str, url: str, type: str, file_name: str, download=None):
+    if RAW_MODE:
+        # Use the original path from the download
+        original_path = download.get("path")
+        if original_path:
+            # Remove the filename to get the directory
+            full_path = os.path.join(MOUNT_PATH, os.path.dirname(original_path))
+    else:
+        if type == "movie":
+            type = "movies"
+        elif type == "series":
+            type = "series"
+        elif type == "anime":
+            type = "series"
+        full_path = os.path.join(MOUNT_PATH, type, file_path)
     try:
         os.makedirs(full_path, exist_ok=True)
         with open(f"{full_path}/{file_name}.strm", "w") as file:
             file.write(url)
         logging.debug(f"Created strm file: {full_path}/{file_name}.strm")
         return True
-    except OSError as e:
-        logging.error(f"Error creating strm file (likely bad or missing permissions): {e}")
-        return False
-    except FileNotFoundError as e:
-        logging.error(f"Error creating strm file (likely bad naming scheme of file): {e}")
-        return False
     except Exception as e:
         logging.error(f"Error creating strm file: {e}")
         return False
+
 
 def runStrm():
     all_downloads = getAllUserDownloads()
@@ -73,9 +72,9 @@ def runStrm():
         file_path = generateFolderPath(download)
         if file_path is None:
             continue
-        generateStremFile(file_path, download.get("download_link"), download.get("metadata_mediatype"), download.get("metadata_filename"))
-
+        generateStremFile(file_path, download.get("download_link"), download.get("metadata_mediatype"), download.get("metadata_filename"), download)
     logging.debug(f"Updated {len(all_downloads)} strm files.")
+
 
 def unmountStrm():
     """
