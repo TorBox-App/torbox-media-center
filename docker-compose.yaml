@@ -6,7 +6,7 @@ services:
         tty: true
         restart: always
         volumes:
-            - /torbox:/torbox
+            - /home/$(whoami)/torbox:/torbox
         environment:
             - TORBOX_API_KEY=<input your api key>
             - MOUNT_METHOD=strm
@@ -14,4 +14,4 @@ services:
             - RAW_MODE=yes
             - ENABLE_METADATA=false
         image: anonymoussystems/torbox-media-center:main
-        build: .
+     
