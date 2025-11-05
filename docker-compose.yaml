@@ -6,9 +6,9 @@ services:
         tty: true
         restart: always
         volumes:
-            - /home/zhinux/torbox:/torbox
+            - /torbox:/torbox
         environment:
-            - TORBOX_API_KEY=b1085f43-07d3-4cbd-b45e-3f48ea99b3c9
+            - TORBOX_API_KEY=<input your api key>
             - MOUNT_METHOD=strm
             - MOUNT_PATH=/torbox
             - RAW_MODE=yes
