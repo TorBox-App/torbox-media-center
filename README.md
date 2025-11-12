@@ -67,7 +67,7 @@ The `fuse` option is meant to be a fallback for everything else, Plex, VLC, Infu
 
 [Above](https://github.com/TorBox-App/torbox-media-center/tree/main?tab=readme-ov-file#compatibility) we explained compatibility, which should be the main driving factor for making a decision, but there are few other things we should mention.
 
-1. The virtual filesystem created by the `fuse` mounting method can be slower (playing files, reading files, listing files and directories) and take up more resources as it emulates an entire filesystem. It also may not play well with your [Docker installation](https://github.com/TorBox-App/torbox-media-center/tree/main?tab=readme-ov-file#running-on-docker-recommended) (if going that route).
+1. The virtual filesystem created by the `fuse` mounting method can be slower (playing files, reading files, listing files and directories) and take up more resources as it emulates an entire filesystem. It also may not play well with your [Docker installation](https://github.com/TorBox-App/torbox-media-center?tab=readme-ov-file#-running-on-docker-with-one-command-recommended) (if going that route).
 2. The `strm` mounting method takes up more storage space, and disk reads and writes as they are physical text files. Over longer periods of time it can wear down your disk (not by much, but it is something we should mention). If you have a slow filesystem (hard drive vs SSD), this can be slower if you have a lot of files.
 
 ## ❓ Why not use RClone?
