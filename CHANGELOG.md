@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/TorBox-App/torbox-media-center/compare/v1.4.0...v1.4.1) (2025-11-16)
+
+
+### Bug Fixes
+
+* handles when file is not found ([9de0a53](https://github.com/TorBox-App/torbox-media-center/commit/9de0a53f4d9df4c65a7602e829a444334ba91f85))
+
 ## [1.4.0](https://github.com/TorBox-App/torbox-media-center/compare/v1.3.0...v1.4.0) (2025-10-16)
 
 
