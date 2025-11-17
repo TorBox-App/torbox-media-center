@@ -25,9 +25,8 @@ if MOUNT_REFRESH_TIME == "instant":
 
 if SCAN_METADATA:
     print("!!! Metadata scanning is enabled. This may slow down the processing of files. !!!")
-
 if MOUNT_REFRESH_TIME == "instant" and SCAN_METADATA:
-    print("!!! Using instant mount refresh time without metadata scanning may lead to excessive API calls. Falling back to 'fast' refresh time. !!!")
-    MOUNT_REFRESH_TIME = MountRefreshTimes.fast.name
+    print("!!! Using instant mount refresh time with metadata scanning may lead to excessive API calls. Falling back to 'fast' refresh time. !!!")
+    MOUNT_REFRESH_TIME = MountRefreshTimes.fast.value
 else:
     MOUNT_REFRESH_TIME = MountRefreshTimes[MOUNT_REFRESH_TIME].value
