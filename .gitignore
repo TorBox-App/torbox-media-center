@@ -179,3 +179,6 @@ movies
 series
 test-*
 *.json
+
+# KC
+publish-ghcr.yaml
