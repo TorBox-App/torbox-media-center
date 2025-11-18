@@ -12,3 +12,5 @@ jobs:
           docker login --username KeiranChristie --password ${{secrets.GH_PAT}} ghcr.ghcr.io
           docker build . --tag ghcr.io/keiranchristie/torbox-media-center:latest
           docker push ghcr.io/keiranchristie/torbox-media-center:latest
+
+#tmp comment

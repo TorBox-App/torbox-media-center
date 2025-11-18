@@ -181,4 +181,3 @@ test-*
 *.json
 
 # KC
-publish-ghcr.yaml
