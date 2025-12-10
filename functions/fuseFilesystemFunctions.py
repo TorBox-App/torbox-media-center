@@ -120,8 +120,8 @@ class TorBoxMediaCenterFuse(Fuse):
         self.cached_links = {}
 
         self.cache = {}
-        self.block_size = 1024 * 1024 * 16
-        self.max_blocks = 16
+        self.block_size = 1024 * 1024 * 64  # 64MB Blocks
+        self.max_blocks = 64 # Max 64 blocks in cache (4GB)
 
     def getFiles(self):
         while True:
