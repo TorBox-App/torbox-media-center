@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.4.1](https://github.com/TorBox-App/torbox-media-center/compare/v1.4.0...v1.4.1) (2025-12-28)
+
+
+### Bug Fixes
+
+* better search and proper folder structure on no metadata ([f18d272](https://github.com/TorBox-App/torbox-media-center/commit/f18d272824076a733afaabb9ef76791369aa3ddf))
+* handles when file is not found ([9de0a53](https://github.com/TorBox-App/torbox-media-center/commit/9de0a53f4d9df4c65a7602e829a444334ba91f85))
+* stores larger blocks to prevent 429s ([94719c7](https://github.com/TorBox-App/torbox-media-center/commit/94719c71358b8d6a6748c4078ce34a747e8d74a8))
+
 ## [1.4.0](https://github.com/TorBox-App/torbox-media-center/compare/v1.3.0...v1.4.0) (2025-10-16)
 
 
