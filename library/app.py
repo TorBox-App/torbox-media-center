@@ -6,6 +6,8 @@ load_dotenv()
 
 SCAN_METADATA = os.getenv("ENABLE_METADATA", "false").lower() == "true"
 
+RAW_MODE = os.getenv("RAW_MODE", "no").lower() == "yes"
+
 class MountRefreshTimes(Enum):
     # times are shown in hours
     slowest = 24 # 24 hours

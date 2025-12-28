@@ -1,3 +1,4 @@
+from library.app import RAW_MODE
 import os
 from library.filesystem import MOUNT_PATH
 import stat
@@ -31,11 +32,29 @@ class VirtualFileSystem:
         self.file_map = self._build_file_map()
 
     def _build_structure(self):
-        structure = {
-            '/': ['movies', 'series'],
-            '/movies': set(),
-            '/series': set()
-        }
+        if RAW_MODE:
+            structure = { '/': set() }
+            for f in self.files:
+                original_path = f.get("path")
+                if original_path:
+                    # Split the path into parts
+                    parts = original_path.split('/')
+                    current_path = '/'
+                    for part in parts[:-1]:  # Skip the filename
+                        if part not in structure.get(current_path, set()):
+                            structure.setdefault(current_path, set()).add(part)
+                            current_path = f"{current_path}{part}/"
+                            structure.setdefault(current_path, set())
+            # Ensure consistent ordering
+            for key in structure:
+                structure[key] = sorted([item for item in structure[key] if item is not None])
+            return structure
+        else:
+            structure = {
+                '/': ['movies', 'series'],
+                '/movies': set(),
+                '/series': set()
+            }
         
         
         for f in self.files:
@@ -69,18 +88,24 @@ class VirtualFileSystem:
             
         return structure
 
-    def _build_file_map(self):
-        file_map = {}
-        
-        for f in self.files:
+def _build_file_map(self):
+    file_map = {}
+    for f in self.files:
+        if RAW_MODE:
+            original_path = f.get("path")
+            if original_path:
+                path = f'/{original_path}'
+                file_map[path] = f
+        else:
             if f.get('metadata_mediatype') == 'movie':
                 path = f'/movies/{f.get("metadata_rootfoldername")}/{f.get("metadata_filename")}'
                 file_map[path] = f
             else:  # series
                 path = f'/series/{f.get("metadata_rootfoldername")}/{f.get("metadata_foldername")}/{f.get("metadata_filename")}'
                 file_map[path] = f
-                
-        return file_map
+
+    return file_map
+
 
     def is_dir(self, path):
         return path in self.structure

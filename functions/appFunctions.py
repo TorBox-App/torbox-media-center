@@ -1,3 +1,4 @@
+from library.app import RAW_MODE
 from functions.torboxFunctions import getUserDownloads, DownloadType
 from library.filesystem import MOUNT_METHOD, MOUNT_PATH
 from library.app import MOUNT_REFRESH_TIME
@@ -8,15 +9,12 @@ import os
 import shutil
 
 def initializeFolders():
-    """
-    Initialize the necessary folders for the application.
-    """
-    folders = [
-        MOUNT_PATH,
-        os.path.join(MOUNT_PATH, "movies"),
-        os.path.join(MOUNT_PATH, "series"),
-    ]
-
+    folders = [MOUNT_PATH]
+    if not RAW_MODE:
+        folders.extend([
+            os.path.join(MOUNT_PATH, "movies"),
+            os.path.join(MOUNT_PATH, "series"),
+        ])
     for folder in folders:
         if os.path.exists(folder):
             logging.debug(f"Folder {folder} already exists. Deleting...")
@@ -29,7 +27,6 @@ def initializeFolders():
         else:
             logging.debug(f"Creating folder {folder}...")
             os.makedirs(folder, exist_ok=True)
-
 
 def getAllUserDownloadsFresh():
     all_downloads = []
