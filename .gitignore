@@ -179,3 +179,7 @@ movies
 series
 test-*
 *.json
+
+# KC
+.github/workflows/docker-build.yml
+.github/workflows/release-please.yml
