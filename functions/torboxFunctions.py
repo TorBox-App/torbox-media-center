@@ -54,7 +54,7 @@ def process_file(item, file, type):
     if item.get("name") == item.get("hash"):
         item["name"] = title_data.get("title", file.get("short_name"))
 
-    metadata, _, _ = searchMetadata(title_data.get("title", file.get("short_name")), title_data, file.get("short_name"), f"{item.get('name')} {file.get('short_name')}", item.get("hash"))
+    metadata, _, _ = searchMetadata(title_data.get("title", file.get("short_name")), title_data, file.get("short_name"), f"{item.get('name')} {file.get('short_name')}", item.get("hash"), item.get("name"))
     data.update(metadata)
     logging.debug(data)
     insertData(data, type.value)
@@ -132,7 +132,7 @@ def getUserDownloads(type: DownloadType):
             
     return files, True, f"{type.value.capitalize()} fetched successfully."
 
-def searchMetadata(query: str, title_data: dict, file_name: str, full_title: str, hash: str):
+def searchMetadata(query: str, title_data: dict, file_name: str, full_title: str, hash: str, item_name: str):
     base_metadata = {
         "metadata_title": cleanTitle(query),
         "metadata_link": None,
@@ -143,9 +143,10 @@ def searchMetadata(query: str, title_data: dict, file_name: str, full_title: str
         "metadata_season": None,
         "metadata_episode": None,
         "metadata_filename": file_name,
-        "metadata_rootfoldername": title_data.get("title", None),
+        "metadata_rootfoldername": title_data.get("item_name", None),
     }
     if not SCAN_METADATA:
+        base_metadata["metadata_rootfoldername"] = item_name
         return base_metadata, False, "Metadata scanning is disabled."
     extension = os.path.splitext(file_name)[-1]
     try:
