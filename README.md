@@ -134,6 +134,31 @@ services:
         image: anonymoussystems/torbox-media-center:latest
 ```
 
+If you're using fuse to mount your folder:  
+
+```yaml
+name: torbox-media-center
+services:
+    torbox-media-center:
+        container_name: torbox-media-center
+        stdin_open: true
+        tty: true
+        restart: always
+        volumes:
+            - <pathToTorboxFolder>:/torbox
+        devices:
+            - /dev/fuse:/dev/fuse
+        environment:
+            - TORBOX_API_KEY=<API_KEY>
+            - MOUNT_METHOD=fuse
+            - MOUNT_PATH=/torbox
+        cap_add:
+            - SYS_ADMIN
+        security_opt:
+            - apparmor:unconfined
+        image: anonymoussystems/torbox-media-center:latest
+```
+
 *You may also use the Github repository container found here: ghcr.io/torbox-app/torbox-media-center:main*
 
 3. Wait for the files to be mounted to your local system.
