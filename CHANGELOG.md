@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/TorBox-App/torbox-media-center/compare/v2.0.0...v2.0.1) (2026-01-16)
+
+
+### Bug Fixes
+
+* adds back fuse mounting ([b92b6b5](https://github.com/TorBox-App/torbox-media-center/commit/b92b6b56d7abb6edba03b51c299cdcbedc725613))
+
 ## [2.0.0](https://github.com/TorBox-App/torbox-media-center/compare/v1.4.0...v2.0.0) (2026-01-16)
 
 
