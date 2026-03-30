@@ -47,7 +47,8 @@ def process_file(item, file, type):
         "file_mimetype": file.get("mimetype"),
         "path": file.get("name"),
         "download_link": f"https://api.torbox.app/v1/api/{type.value}/requestdl?token={TORBOX_API_KEY}&{IDType[type.value].value}={item.get('id')}&file_id={file.get('id')}&redirect=true",
-        "extension": os.path.splitext(file.get("short_name"))[-1],              
+        "extension": os.path.splitext(file.get("short_name"))[-1],
+        "created_at": item.get("created_at"),
     }
     title_data = PTN.parse(file.get("short_name"))
 

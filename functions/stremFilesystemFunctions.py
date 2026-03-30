@@ -1,6 +1,7 @@
 import os
 import glob
 import logging
+from datetime import datetime
 from library.app import RAW_MODE
 from library.filesystem import MOUNT_PATH
 from functions.appFunctions import getAllUserDownloads
@@ -59,9 +60,18 @@ def generateStremFile(file_path: str, url: str, type: str, file_name: str, downl
         full_path = os.path.join(MOUNT_PATH, type, file_path)
     try:
         os.makedirs(full_path, exist_ok=True)
-        with open(f"{full_path}/{file_name}.strm", "w") as file:
+        strm_file_path = f"{full_path}/{file_name}.strm"
+        with open(strm_file_path, "w") as file:
             file.write(url)
-        logging.debug(f"Created strm file: {full_path}/{file_name}.strm")
+        if download:
+            created_at = download.get("created_at")
+            if created_at:
+                try:
+                    ts = datetime.fromisoformat(created_at.replace("Z", "+00:00")).timestamp()
+                    os.utime(strm_file_path, (ts, ts))
+                except (ValueError, AttributeError, OSError):
+                    pass  # fall back to current time set by the OS
+        logging.debug(f"Created strm file: {strm_file_path}")
         return True
     except FileNotFoundError as e:
         logging.error(f"Error creating strm file (likely bad naming scheme of file): {e}")

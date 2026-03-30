@@ -5,6 +5,7 @@ import stat
 import errno
 from functions.torboxFunctions import getDownloadLink, downloadFile
 import time
+from datetime import datetime
 import sys
 import logging
 from functions.appFunctions import getAllUserDownloads
@@ -163,10 +164,10 @@ class TorBoxMediaCenterFuse(Fuse):
         st.st_atime = now
         st.st_mtime = now
         st.st_ctime = now
-        
+
         st.st_uid = os.getuid()
         st.st_gid = os.getgid()
-        
+
         if self.vfs.is_dir(path):
             st.st_mode = stat.S_IFDIR | 0o755
             st.st_nlink = 2
@@ -178,8 +179,16 @@ class TorBoxMediaCenterFuse(Fuse):
             st.st_mode = stat.S_IFREG | 0o444
             st.st_nlink = 1
             st.st_size = file_info.get('file_size', 0)
+            created_at = file_info.get('created_at')
+            if created_at:
+                try:
+                    ts = int(datetime.fromisoformat(created_at.replace("Z", "+00:00")).timestamp())
+                    st.st_mtime = ts
+                    st.st_ctime = ts
+                except (ValueError, AttributeError):
+                    pass  # fall back to current time already set above
             return st
-            
+
         # Not found
         return -errno.ENOENT
     
