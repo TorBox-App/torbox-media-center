@@ -203,7 +203,7 @@ def downloadFile(url: str, size: int, offset: int = 0):
         "Range": f"bytes={offset}-{offset + size - 1}",
         **general_http_client.headers,
     }
-    response = requestWrapper(general_http_client, "GET", url, headers=headers)
+    response = requestWrapper(general_http_client, "GET", url, use_cache=False, headers=headers)
     if response.status_code == httpx.codes.OK:
         return response.content
     elif response.status_code == httpx.codes.PARTIAL_CONTENT:
