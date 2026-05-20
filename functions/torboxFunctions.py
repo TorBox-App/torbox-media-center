@@ -194,7 +194,7 @@ def searchMetadata(query: str, title_data: dict, file_name: str, full_title: str
 
 def getDownloadLink(url: str):
     response = requestWrapper(general_http_client, "GET", url)
-    if response.status_code == httpx.codes.TEMPORARY_REDIRECT or response.status_code == httpx.codes.PERMANENT_REDIRECT or response.status_code == httpx.codes.FOUND:
+    if response.has_redirect_location:
         return response.headers.get('Location')
     return url
 
