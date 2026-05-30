@@ -7,7 +7,6 @@ import hashlib
 import json
 
 TORBOX_API_URL = "https://api.torbox.app/v1/api"
-TORBOX_SEARCH_API_URL = "https://search-api.torbox.app"
 USER_AGENT = f"TorBox-Media-Center/{getCurrentVersion()} TorBox/1.0"
 CACHE_TTL = 300 # cache time-to-live in seconds
 _cache: dict[str, tuple[float, httpx.Response]] = {}
@@ -37,17 +36,6 @@ api_http_client = httpx.Client(
     timeout=httpx.Timeout(60),
     follow_redirects=True,
     transport=transport
-)
-
-search_api_http_client = httpx.Client(
-    base_url=TORBOX_SEARCH_API_URL,
-    headers={
-        "Authorization": f"Bearer {TORBOX_API_KEY}",
-        "User-Agent": USER_AGENT,
-    },
-    timeout=httpx.Timeout(60),
-    follow_redirects=True,
-    transport=transport,
 )
 
 general_http_client = httpx.Client(

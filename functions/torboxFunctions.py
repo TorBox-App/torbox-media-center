@@ -1,4 +1,4 @@
-from library.http import api_http_client, search_api_http_client, general_http_client, requestWrapper
+from library.http import api_http_client, general_http_client, requestWrapper
 import httpx
 from enum import Enum
 import PTN
@@ -54,7 +54,7 @@ def process_file(item, file, type):
     if item.get("name") == item.get("hash"):
         item["name"] = title_data.get("title", file.get("short_name"))
 
-    metadata, _, _ = searchMetadata(title_data.get("title", file.get("short_name")), title_data, file.get("short_name"), f"{item.get('name')} {file.get('short_name')}", item.get("hash"), item.get("name"))
+    metadata = parseMetadata(title_data, file.get("short_name"), item.get("name"))
     data.update(metadata)
     logging.debug(data)
     insertData(data, type.value)
@@ -132,9 +132,10 @@ def getUserDownloads(type: DownloadType):
             
     return files, True, f"{type.value.capitalize()} fetched successfully."
 
-def searchMetadata(query: str, title_data: dict, file_name: str, full_title: str, hash: str, item_name: str):
+def parseMetadata(title_data: dict, file_name: str, item_name: str) -> dict:
+    extension = os.path.splitext(file_name)[-1]
     base_metadata = {
-        "metadata_title": cleanTitle(query),
+        "metadata_title": cleanTitle(title_data.get("title", os.path.splitext(file_name)[0])),
         "metadata_link": None,
         "metadata_mediatype": "movie",
         "metadata_image": None,
@@ -143,54 +144,39 @@ def searchMetadata(query: str, title_data: dict, file_name: str, full_title: str
         "metadata_season": None,
         "metadata_episode": None,
         "metadata_filename": file_name,
-        "metadata_rootfoldername": title_data.get("item_name", None),
+        "metadata_rootfoldername": item_name,
     }
     if not SCAN_METADATA:
-        base_metadata["metadata_rootfoldername"] = item_name
-        return base_metadata, False, "Metadata scanning is disabled."
-    extension = os.path.splitext(file_name)[-1]
-    try:
-        response = requestWrapper(search_api_http_client, "GET", f"/meta/search/{full_title}", params={"type": "file"})
-    except Exception as e:
-        logging.error(f"Error searching metadata: {e}")
-        return base_metadata, False, f"Error searching metadata: {e}. Searching for {query}, item hash: {hash}"
-    if response.status_code != 200:
-        logging.error(f"Error searching metadata: {response.status_code}. {response.text}")
-        return base_metadata, False, f"Error searching metadata. {response.status_code}. Searching for {query}, item hash: {hash}"
-    try:
-        data = response.json().get("data", [])[0]
+        return base_metadata
 
-        title = cleanTitle(data.get("title"))
-        base_metadata["metadata_title"] = title
-        base_metadata["metadata_years"] = cleanYear(title_data.get("year", None) or data.get("releaseYears", None))
+    raw_title = title_data.get("title") or os.path.splitext(file_name)[0]
+    title = cleanTitle(raw_title)
+    year = cleanYear(title_data.get("year"))
+    season = title_data.get("season")
+    episode = title_data.get("episode")
+    root_folder = f"{title} ({year})" if year else title
 
-        if data.get("type") == "anime" or data.get("type") == "series":
-            series_season_episode = constructSeriesTitle(season=title_data.get("season", None), episode=title_data.get("episode", None))
-            file_name = f"{title} {series_season_episode}{extension}"
-            base_metadata["metadata_foldername"] = constructSeriesTitle(season=title_data.get("season", 1), folder=True)
-            base_metadata["metadata_season"] = title_data.get("season", 1)
-            base_metadata["metadata_episode"] = title_data.get("episode")
-        elif data.get("type") == "movie":
-            file_name = f"{title} ({base_metadata['metadata_years']}){extension}"
-        else:
-            return base_metadata, False, f"No metadata found. Searching for {query}, item hash: {hash}"
-            
-        base_metadata["metadata_filename"] = file_name
-        base_metadata["metadata_mediatype"] = data.get("type")
-        base_metadata["metadata_link"] = data.get("link")
-        base_metadata["metadata_image"] = data.get("image")
-        base_metadata["metadata_backdrop"] = data.get("backdrop")
-        base_metadata["metadata_rootfoldername"] = f"{title} ({base_metadata['metadata_years']})"
+    base_metadata.update({
+        "metadata_title": title,
+        "metadata_years": year,
+        "metadata_season": season,
+        "metadata_episode": episode,
+        "metadata_rootfoldername": root_folder,
+    })
 
-        return base_metadata, True, f"Metadata found. Searching for {query}, item hash: {hash}"
-    except IndexError:
-        return base_metadata, False, f"No metadata found. Searching for {query}, item hash: {hash}"
-    except httpx.TimeoutException:
-        return base_metadata, False, f"Timeout searching metadata. Searching for {query}, item hash: {hash}"
-    except Exception as e:
-        logging.error(f"Error searching metadata: {e}")
-        logging.error(f"Error searching metadata: {traceback.format_exc()}")
-        return base_metadata, False, f"Error searching metadata: {e}. Searching for {query}, item hash: {hash}"
+    if season is not None or episode is not None:
+        season_num = season if season is not None else 1
+        se_tag = constructSeriesTitle(season=season_num, episode=episode)
+        fname = f"{title} {se_tag}{extension}" if se_tag else f"{title}{extension}"
+        base_metadata["metadata_mediatype"] = "series"
+        base_metadata["metadata_filename"] = fname
+        base_metadata["metadata_foldername"] = constructSeriesTitle(season=season_num, folder=True)
+    else:
+        fname = f"{title} ({year}){extension}" if year else f"{title}{extension}"
+        base_metadata["metadata_mediatype"] = "movie"
+        base_metadata["metadata_filename"] = fname
+
+    return base_metadata
 
 def getDownloadLink(url: str):
     response = requestWrapper(general_http_client, "GET", url)
